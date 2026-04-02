@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+/* الكود السحري اللي بيخليك تسحب النافذة بالماوس */
+.drag-area {
+  -webkit-app-region: drag;
+}
+
+/* عشان الزراير اللي جوه منطقة السحب تفضل شغالة وتقدر تدوس عليها */
+.no-drag {
+  -webkit-app-region: no-drag;
+}
+
+/* تجميل شكل شريط التمرير (Scrollbar) */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 10px;
+}
+
+/* أنيميشن شريط الإشعار اللي بيقفل النافذة */
+.progress-shrink {
+  animation: shrink 6s linear forwards;
+}
+
+@keyframes shrink {
+  from { width: 100%; }
+  to { width: 0%; }
+}
