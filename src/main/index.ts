@@ -1,7 +1,7 @@
 import { app, shell, BrowserWindow, ipcMain, Tray, Menu, screen, Notification, globalShortcut } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import icon from '../../resources/icon.png?asset'
+import icon from '../../resources/favicon.ico?asset'
 import { autoUpdater } from 'electron-updater'
 import { dialog } from 'electron'
 

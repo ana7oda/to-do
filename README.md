@@ -32,3 +32,8 @@ $ npm run build:mac
 # For Linux
 $ npm run build:linux
 ```
+
+### UPLOAD
+``` bash
+$ npm run publish:win
+```
