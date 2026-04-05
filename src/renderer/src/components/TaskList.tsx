@@ -1,12 +1,13 @@
 import { useRef, useState, useEffect } from 'react'
 import { Task } from '../App'
 
-function TaskList({ tasks, onToggle, onDelete, onReorder, onUpdateDetails }: { 
+function TaskList({ tasks, onToggle, onDelete, onReorder, onUpdateDetails, onStartFocus }: { 
   tasks: Task[], 
   onToggle: (id: number) => void,
   onDelete: (id: number) => void,
   onReorder: (tasks: Task[]) => void,
-  onUpdateDetails: (id: number, startTime: string, endTime: string, priority?: 'high'|'medium'|'low', category?: string) => void
+  onUpdateDetails: (id: number, startTime: string, endTime: string, priority?: 'high'|'medium'|'low', category?: string) => void,
+  onStartFocus: (id: number) => void
 }) {
   const dragItem = useRef<number | null>(null)
   const dragOverItem = useRef<number | null>(null)
@@ -120,6 +121,20 @@ function TaskList({ tasks, onToggle, onDelete, onReorder, onUpdateDetails }: {
                 )}
               </div>
             </div>
+
+            {/* 🌟 زرار التركيز الجديد */}
+              {!task.done && (
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onStartFocus(task.id)
+                  }}
+                  className="text-xs text-yellow-400 hover:text-yellow-300 hover:bg-yellow-500/20 p-1.5 rounded cursor-pointer outline-none"
+                  title="بدء التركيز العميق (Pomodoro)"
+                >
+                  ⏱️
+                </button>
+              )}
 
             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 shrink-0">
               <button 

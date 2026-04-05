@@ -5,6 +5,8 @@ const api = {
   hideWindow: () => ipcRenderer.send('hide-window'),
   toggleCollapse: (isCollapsed: boolean) => ipcRenderer.send('toggle-collapse', isCollapsed),
   showNotification: (text: string) => ipcRenderer.send('show-notification', text),
+  startFocus: () => ipcRenderer.send('start-focus'),
+  stopFocus: () => ipcRenderer.send('stop-focus'),
   onNotificationData: (callback: (data: string) => void) => {
     ipcRenderer.on('notification-data', (_, data) => callback(data))
   }

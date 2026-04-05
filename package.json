@@ -1,6 +1,6 @@
 {
   "name": "micro-todo-widget",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An Electron application with React and TypeScript",
   "main": "./out/main/index.js",
   "author": "OdexAi",
@@ -46,6 +46,7 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
+    "@supabase/supabase-js": "^2.101.1",
     "electron-updater": "^6.8.3"
   },
   "devDependencies": {

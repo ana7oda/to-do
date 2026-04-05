@@ -4,6 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/favicon.ico?asset'
 import { autoUpdater } from 'electron-updater'
 import { dialog } from 'electron'
+import { exec } from 'child_process'
 
 // تعريف المتغيرات هنا عشان تفضل شغالة في الخلفية وماتتمسحش من الذاكرة
 let mainWindow: BrowserWindow | null = null
@@ -57,11 +58,15 @@ app.whenReady().then(() => {
 
   createWindow()
 
-  // 🌟 1. التشغيل التلقائي مع الويندوز (بصمت)
-  app.setLoginItemSettings({
-    openAtLogin: true,
-    args: ['--hidden'] // المعامل ده اللي بيعرفنا إنه شغال مع البوت عشان نخبيه
-  })
+// 🌟 1. التشغيل التلقائي مع الويندوز (بصمت)
+  // الشرط ده بيمنع التطبيق يسجل نفسه في الويندوز وهو في وضع التطوير (عشان ميجيبش الشاشة الزرقاء)
+  if (app.isPackaged) {
+    app.setLoginItemSettings({
+      openAtLogin: true,
+      path: process.execPath, // 🌟 السطر ده بيجبره يشاور على OdexAi Tasks.exe النهائي
+      args: ['--hidden']
+    })
+  }
 
   // 🌟 2. الاختصار السحري (Alt + Space)
   globalShortcut.register('Alt+Space', () => {
@@ -174,6 +179,18 @@ app.whenReady().then(() => {
     }, 6000)
   })
 
+  // 🌟 تفعيل وضع التركيز (قفل إشعارات الويندوز)
+  ipcMain.on('start-focus', () => {
+    // كود PowerShell لتفعيل Focus Assist (Alarms Only)
+    exec('powershell -Command "Set-ItemProperty -Path \'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings\' -Name \'NOC_GLOBAL_SETTING_TOASTS_LEVEL\' -Value 2"')
+  })
+
+  // 🌟 إيقاف وضع التركيز (تشغيل إشعارات الويندوز تاني)
+  ipcMain.on('stop-focus', () => {
+    // كود PowerShell لتعطيل Focus Assist
+    exec('powershell -Command "Set-ItemProperty -Path \'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings\' -Name \'NOC_GLOBAL_SETTING_TOASTS_LEVEL\' -Value 0"')
+  })
+
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
@@ -181,17 +198,37 @@ app.whenReady().then(() => {
   // 🌟 1. اسأل السيرفر: فيه تحديث؟
   autoUpdater.checkForUpdates()
 
-  // 🌟 2. لما التحديث ينزل بالكامل في الخلفية، طلع رسالة للمستخدم
+  // 🌟 مراقبة ما يحدث خلف الكواليس (عشان نعرف المشكلة فين)
+  autoUpdater.on('update-available', (info) => {
+    dialog.showMessageBox({
+      type: 'info',
+      title: 'جاري التحديث... ⏳',
+      message: `لقينا إصدار جديد (${info.version}) على جيت هاب وبيتحمل دلوقتي...`
+    })
+  })
+
+  autoUpdater.on('update-not-available', (info) => {
+    dialog.showMessageBox({
+      type: 'info',
+      title: 'أنت في السليم! ✅',
+      message: 'البرنامج اتصل بجيت هاب ولقى إن مفيش تحديثات جديدة ونسختك دي أحدث حاجة.'
+    })
+  })
+
+  autoUpdater.on('error', (err) => {
+    dialog.showErrorBox('رسالة من الكواليس (خطأ في التحديث) ❌', err == null ? "unknown" : (err.stack || err).toString())
+  })
+
+  // 🌟 2. لما التحديث ينزل بالكامل
   autoUpdater.on('update-downloaded', (info) => {
     dialog.showMessageBox({
       type: 'info',
       title: 'تحديث جديد جاهز! 🚀',
-      message: `تم تحميل الإصدار الجديد (${info.version}) من OdexAi Tasks.`,
+      message: `تم تحميل الإصدار الجديد (${info.version}) بنجاح.`,
       buttons: ['تثبيت الآن وإعادة التشغيل', 'لاحقاً'],
       defaultId: 0,
       cancelId: 1
     }).then((result) => {
-      // لو المستخدم اختار "تثبيت الآن"
       if (result.response === 0) {
         autoUpdater.quitAndInstall()
       }
