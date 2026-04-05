@@ -9,7 +9,6 @@ export default function HistoryList() {
   useEffect(() => {
     // جلب المهام من الذاكرة المحلية
     const saved = JSON.parse(localStorage.getItem('odexai-history') || '[]')
-    // ترتيب من الأحدث للأقدم
     saved.sort((a: ArchivedTask, b: ArchivedTask) => new Date(b.archivedAt).getTime() - new Date(a.archivedAt).getTime())
     setHistory(saved)
   }, [])
@@ -58,7 +57,6 @@ export default function HistoryList() {
                 <div className="flex flex-col flex-1 overflow-hidden">
                   <span className="text-sm text-gray-400 line-through decoration-gray-600 truncate">{task.text}</span>
                   
-                  {/* عرض التاجز (القسم والأولوية) عشان تفتكر المهمة كانت إيه */}
                   {(task.category || task.priority) && (
                     <div className="flex gap-1.5 mt-1.5 flex-wrap">
                       {task.category && (

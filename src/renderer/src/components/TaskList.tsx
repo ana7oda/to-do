@@ -18,14 +18,14 @@ function TaskList({ tasks, onToggle, onDelete, onReorder, onUpdateDetails, onSta
   const [tempPriority, setTempPriority] = useState<'high'|'medium'|'low'|undefined>(undefined)
   const [tempCategory, setTempCategory] = useState('')
 
-  // 🌟 مراقب الوقت الخاص بشريط التقدم
+  // مراقب الوقت الخاص بشريط التقدم
   const [now, setNow] = useState(new Date())
   useEffect(() => {
     const interval = setInterval(() => setNow(new Date()), 10000) // يتحدث كل 10 ثواني
     return () => clearInterval(interval)
   }, [])
 
-  // 🌟 دالة حساب نسبة التقدم المئوية
+  // دالة حساب نسبة التقدم المئوية
   const calculateProgress = (start?: string, end?: string) => {
     if (!start || !end) return 0
     const [startH, startM] = start.split(':').map(Number)
@@ -122,7 +122,7 @@ function TaskList({ tasks, onToggle, onDelete, onReorder, onUpdateDetails, onSta
               </div>
             </div>
 
-            {/* 🌟 زرار التركيز الجديد */}
+            {/*  زرار التركيز الجديد */}
               {!task.done && (
                 <button 
                   onClick={(e) => {
@@ -168,7 +168,7 @@ function TaskList({ tasks, onToggle, onDelete, onReorder, onUpdateDetails, onSta
             </div>
           </div>
 
-          {/* 🌟 واجهة الإعدادات المصغرة (صفين عشان تكفي كل حاجة) */}
+          {/* واجهة الإعدادات المصغرة (صفين عشان تكفي كل حاجة) */}
           {editingTimeId === task.id && (
             <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-gray-700/50 cursor-default" onClick={(e) => e.stopPropagation()}>
               

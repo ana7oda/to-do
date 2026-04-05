@@ -8,7 +8,6 @@ function Header({
       <h2 className="text-sm font-bold text-blue-400 select-none flex items-center gap-2">
         {showHistory ? 'أرشيف المهام' : showSettings ? 'الإعدادات' : 'OdexAi Tasks'}
         
-        {/* 🌟 عداد البومودورو المصغر بيظهر لو النافذة مطوية وفي جلسة شغالة */}
         {isCollapsed && pomodoroMode && pomodoroMode !== 'idle' && (
           <span className={`text-xs px-2 py-0.5 rounded font-mono ${pomodoroMode === 'work' ? 'bg-red-900/50 text-red-300' : 'bg-green-900/50 text-green-300'}`}>
             ⏱ {pomodoroTime}
@@ -18,7 +17,7 @@ function Header({
 
       <div className="flex gap-3 no-drag items-center">
         
-        {/* 🌟 زرار الإعدادات */}
+        {/*  زرار الإعدادات */}
         {!isCollapsed && onToggleSettings && !showHistory && (
           <button 
             onClick={onToggleSettings} 
@@ -43,7 +42,7 @@ function Header({
           </button>
         )}
 
-        {/* 🌟 زرار السجل / الرئيسية (بيختفي لو الإعدادات مفتوحة) */}
+        {/*  زرار السجل / الرئيسية (بيختفي لو الإعدادات مفتوحة) */}
         {!isCollapsed && onToggleHistory && !showSettings && (
           <button 
             onClick={onToggleHistory} 
@@ -64,7 +63,7 @@ function Header({
           </button>
         )}
 
-        {/* 🌟 زرار الأرشيف (بيختفي لو إحنا جوه السجل أو الإعدادات) */}
+        {/*  زرار الأرشيف (بيختفي لو إحنا جوه السجل أو الإعدادات) */}
         {!isCollapsed && !showHistory && !showSettings && (
           <button 
             onClick={onArchive} 
@@ -79,7 +78,7 @@ function Header({
           </button>
         )}
 
-        {/* 🌟 زرار الطي والفرد */}
+        {/*  زرار الطي والفرد */}
         <button 
           onClick={onToggleCollapse} 
           className="text-gray-400 hover:text-blue-400 transition-colors cursor-pointer outline-none focus:outline-none flex items-center justify-center"
@@ -90,7 +89,7 @@ function Header({
           </svg>
         </button>
         
-        {/* 🌟 زرار الإخفاء */}
+        {/*  زرار الإخفاء */}
         <button 
           onClick={onClose} 
           className="text-gray-500 hover:text-red-400 transition-colors cursor-pointer text-xl leading-none outline-none focus:outline-none"

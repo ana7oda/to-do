@@ -8,7 +8,7 @@ type PomodoroTimerProps = {
 };
 
 const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ time, mode, taskName, onStop }) => {
-  if (mode === 'idle') return null; // مفيش حاجة شغالة، نخبيه
+  if (mode === 'idle') return null; 
 
   const isWork = mode === 'work';
 

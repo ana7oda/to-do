@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../supabaseClient'; // 🌟 استدعاء السحابة
+import { supabase } from '../supabaseClient'; 
 
 function Settings() {
   const [workTime, setWorkTime] = useState(25);
@@ -8,10 +8,9 @@ function Settings() {
   const [discordWebhook, setDiscordWebhook] = useState(''); 
   const [savedMessage, setSavedMessage] = useState('');
 
-// 🌟 استرجاع الإعدادات المحفوظة (من الجهاز والسحابة)
+//  استرجاع الإعدادات المحفوظة (من الجهاز والسحابة)
   useEffect(() => {
     const loadSettings = async () => {
-      // 1. قراءة الإعدادات المحلية (للسرعة)
       const saved = localStorage.getItem('odexai-settings');
       let localSettings: any = {};
       if (saved) {
@@ -22,17 +21,15 @@ function Settings() {
         if (localSettings.discordWebhook) setDiscordWebhook(localSettings.discordWebhook); 
       }
 
-      // 2. سحب الإعدادات من السحابة للمستخدم الحالي
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
-        // 🌟 استبدلنا single بـ maybeSingle عشان ميعملش خطأ 406 لو دي أول مرة ليك
+        //  استبدلنا single بـ maybeSingle عشان ميعملش خطأ 406 لو دي أول مرة ليك
         const { data, error } = await supabase.from('settings').select('*').eq('user_id', session.user.id).maybeSingle();
         if (data && !error) {
           if (data.work_time) setWorkTime(data.work_time);
           if (data.break_time) setBreakTime(data.break_time);
           if (data.discord_webhook) setDiscordWebhook(data.discord_webhook);
           
-          // تحديث الذاكرة المحلية ببيانات السحابة
           const updatedSettings = { ...localSettings, workTime: data.work_time, breakTime: data.break_time, discordWebhook: data.discord_webhook };
           localStorage.setItem('odexai-settings', JSON.stringify(updatedSettings));
         }
@@ -52,7 +49,6 @@ function Settings() {
     }
   };
 
-// 🌟 دالة الحفظ مع دعم حسابات المستخدمين وإصلاح الأخطاء (النسخة النهائية الآمنة)
   const handleSave = async () => {
     const newSettings = { workTime, breakTime, bgImage, discordWebhook }; 
     localStorage.setItem('odexai-settings', JSON.stringify(newSettings));
@@ -65,19 +61,16 @@ function Settings() {
     }
     const userId = session.user.id;
 
-    // 2. فحص هل المستخدم ليه إعدادات سابقة ولا دي أول مرة؟ (استخدمنا maybeSingle)
     const { data: existingSettings } = await supabase.from('settings').select('id').eq('user_id', userId).maybeSingle();
 
     let dbError;
     let dbData;
 
-    // 🌟 تأمين الأرقام: تحويلها لأرقام صحيحة ومنعها من النزول عن 1
+    //  تأمين الأرقام: تحويلها لأرقام صحيحة ومنعها من النزول عن 1
     const safeWorkTime = Math.max(1, Math.round(workTime));
     const safeBreakTime = Math.max(1, Math.round(breakTime));
 
-    // 3. التحديث أو الإضافة بناءً على حالة المستخدم
     if (existingSettings) {
-      // لو مسجل قبل كده، بنعمل Update
       const { data, error } = await supabase.from('settings').update({
         discord_webhook: discordWebhook,
         work_time: safeWorkTime,
@@ -85,9 +78,8 @@ function Settings() {
       }).eq('user_id', userId).select();
       dbError = error; dbData = data;
     } else {
-      // لو مستخدم جديد لسه عامل حساب، بنعمل Insert مع ID عشوائي عشان نمنع التعارض
       const { data, error } = await supabase.from('settings').insert([{
-        id: Math.floor(Math.random() * 1000000), // 🌟 رقم فريد عشان ميحصلش Error
+        id: Math.floor(Math.random() * 1000000), 
         user_id: userId,
         discord_webhook: discordWebhook,
         work_time: safeWorkTime,
@@ -97,7 +89,6 @@ function Settings() {
     }
 
     if (dbError) {
-      // 🌟 فك تشفير الخطأ وعرضه بوضوح لو حصل
       console.error("🚨 خطأ تفصيلي من قاعدة البيانات:", JSON.stringify(dbError, null, 2)); 
       alert("فشل الرفع! راجع الـ Console.");
     } else {

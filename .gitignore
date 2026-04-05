@@ -1,7 +1,48 @@
-node_modules
-dist
-out
-.DS_Store
-.eslintcache
-*.log*
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+out/
+build/
+release/
+
+# Environment variables
 .env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+
+# Cache
+.eslintcache
+.cache/
+.vite/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Coverage / testing
+coverage/
+
+# Misc
+*.bak

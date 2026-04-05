@@ -3,11 +3,11 @@ import Header from './components/Header'
 import TaskInput from './components/TaskInput'
 import TaskList from './components/TaskList'
 import HistoryList from './components/HistoryList'
-import Settings from './components/Settings' // 🌟 الاستدعاء الجديد
+import Settings from './components/Settings' 
 import { usePomodoro } from './hooks/usePomodoro'
 import PomodoroTimer from './components/PomodoroTimer'
-import { supabase } from './supabaseClient' // 🌟 استدعاء السحابة
-import type { Session } from '@supabase/supabase-js' // 🌟 نوع جلسة المستخدم
+import { supabase } from './supabaseClient' 
+import type { Session } from '@supabase/supabase-js' 
 
 export type Task = { id: number; text: string; done: boolean; startTime?: string; endTime?: string; notified?: boolean; priority?: 'high' | 'medium' | 'low'; category?: string; user_id?: string }
 
@@ -23,11 +23,10 @@ function App(): React.JSX.Element {
   const [isCollapsed, setIsCollapsed] = useState(false) 
   const [showHistory, setShowHistory] = useState(false)
   const [showSettings, setShowSettings] = useState(false) 
-  const [appBgImage, setAppBgImage] = useState<string | null>(null) // 🌟 حالة الخلفية
+  const [appBgImage, setAppBgImage] = useState<string | null>(null) 
   
   const { formattedTime, mode, activeTaskId, startWork, stopTimer } = usePomodoro()
 
-  // 🌟 قراءة الصورة من الإعدادات
   useEffect(() => {
     const loadTheme = () => {
       const saved = localStorage.getItem('odexai-settings')
@@ -49,7 +48,7 @@ function App(): React.JSX.Element {
     return []
   })
 
-// 🌟 مراقبة حالة تسجيل الدخول
+//  مراقبة حالة تسجيل الدخول
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
@@ -60,7 +59,7 @@ function App(): React.JSX.Element {
     return () => subscription.unsubscribe()
   }, [])
 
-  // 🌟 دالة تسجيل الدخول / إنشاء حساب
+  //  دالة تسجيل الدخول / إنشاء حساب
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault()
     setAuthMsg('جاري التحميل... ⏳')
@@ -75,10 +74,10 @@ function App(): React.JSX.Element {
     }
   }
 
-  // 🌟 سحب مهام المستخدم الحالي فقط من السحابة
+  //  سحب مهام المستخدم الحالي فقط من السحابة
   useEffect(() => {
     const fetchCloudTasks = async () => {
-      if (!session?.user) return // متسحبش إلا لو مسجل دخول
+      if (!session?.user) return 
       const { data, error } = await supabase.from('tasks').select('*').eq('user_id', session.user.id)
       if (!error && data) {
         setTasks(data)
@@ -94,12 +93,11 @@ function App(): React.JSX.Element {
 
   // دالة تشغيل الأصوات
   const playSound = (sound: string) => {
-    // استخدمنا مسار مباشر لأن الملفات هتتحط في فولدر public
     const audio = new Audio(`./${sound}.mp3`)
     audio.play().catch(e => console.log('ملف الصوت مش موجود:', e))
   }
 
-  // 🌟 دالة إرسال إشعار لديسكورد
+  // دالة إرسال إشعار لديسكورد
   const sendDiscordWebhook = (embed: any) => {
     const saved = localStorage.getItem('odexai-settings')
     if (saved) {
@@ -110,7 +108,7 @@ function App(): React.JSX.Element {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             username: "OdexAi Tasks",
-            avatar_url: "https://odexai.xyz/logo.png", // لوجو البوت بتاعك
+            avatar_url: "https://to-do.odexai.xyz/logo.png", // لوجو البوت بتاعك
             embeds: [embed]
           })
         }).catch(e => console.log("خطأ في ديسكورد:", e))
@@ -126,18 +124,15 @@ function App(): React.JSX.Element {
 
       let hasUpdates = false
       const updatedTasks = tasks.map(task => {
-        // نتحقق من وقت البدء startTime
         if (!task.done && task.startTime === currentTime && !task.notified) {
           playSound('alarm')
-          // 🌟 استدعاء نافذة الإشعار المخصصة بدلاً من إشعار الويندوز
           // @ts-ignore
           window.api.showNotification(task.text)
           
-          // 🌟 الإضافة الجديدة: إرسال إشعار لديسكورد لما ميعاد المهمة ييجي!
           sendDiscordWebhook({
             title: "⏰ حان وقت المهمة!",
             description: `ميعاد المهمة دي جه دلوقتي: **${task.text}**\nيلا بينا نركز ونخلصها! 🚀`,
-            color: 3447003, // لون أزرق شيك
+            color: 3447003, 
             footer: { text: "OdexAi Productivity System" }
           });
 
@@ -153,27 +148,21 @@ function App(): React.JSX.Element {
     return () => clearInterval(interval)
   }, [tasks])
 
-  // رجعنا دالة الإضافة إنها تقبل النص بس عشان السرعة
   const addTask = async (text: string) => {
     if (!text.trim() || !session?.user) return
-    // 🌟 إضافة الـ user_id للمهمة عشان تتسجل باسم صاحبها
     const newTask = { id: Date.now(), text, done: false, notified: false, user_id: session.user.id }
     setTasks([...tasks, newTask])
     playSound('add')
 
-    // 🌟 الرفع للسحابة
     await supabase.from('tasks').insert([newTask])
   }
 
-  // دالة تحديث شاملة (وقت، أولوية، قسم)
  const updateTaskDetails = async (id: number, startTime: string, endTime: string, priority?: 'high'|'medium'|'low', category?: string) => {
     setTasks(tasks.map(t => t.id === id ? { ...t, startTime, endTime, priority, category, notified: false } : t))
 
-    // 🌟 تحديث السحابة
     await supabase.from('tasks').update({ startTime, endTime, priority, category, notified: false }).eq('id', id)
   }
 
-  // 🌟 دالة الأرشيف (بتحفظ المهام المكتملة وتمسحها من القائمة)
   const archiveCompletedTasks = () => {
     const completed = tasks.filter(t => t.done)
     
@@ -186,7 +175,7 @@ function App(): React.JSX.Element {
     const newHistory = [...existingHistory, ...completed.map(t => ({ ...t, archivedAt: new Date().toISOString() }))]
     localStorage.setItem('odexai-history', JSON.stringify(newHistory))
 
-    // 🌟 إرسال تقرير لديسكورد
+    //  إرسال تقرير لديسكورد
     sendDiscordWebhook({
       title: "📦 تم أرشفة المهام (يوم جديد)",
       description: `عاش! تم إنجاز وأرشفة **${completed.length}** مهام. جاهز لتحديات جديدة؟`,
@@ -196,7 +185,6 @@ function App(): React.JSX.Element {
 
     setTasks(tasks.filter(t => !t.done))
     playSound('delete') 
-    // 🌟 مسح المهام المؤرشفة من السحابة
     const completedIds = completed.map(t => t.id);
     if (completedIds.length > 0) {
       supabase.from('tasks').delete().in('id', completedIds).then();
@@ -225,7 +213,6 @@ const toggleTask = async (id: number) => {
       return t
     }))
 
-    // 🌟 تحديث السحابة
     await supabase.from('tasks').update({ done: newDoneStatus }).eq('id', id)
   }
 
@@ -234,22 +221,18 @@ const toggleTask = async (id: number) => {
     setTasks(tasks.filter(t => t.id !== id))
     playSound('delete') 
 
-    // 🌟 مسح من السحابة
     await supabase.from('tasks').delete().eq('id', id)
   }
 
-  // دالة تحديث المهام بعد السحب والإفلات (الترتيب)
   const reorderTasks = (newTasks: Task[]) => {
     setTasks(newTasks)
   }
 
-  // الدالة الجديدة للإخفاء
   const hideApp = () => {
     // @ts-ignore
     window.api.hideWindow()
   }
 
-  // دالة الطي والفرد
   const toggleCollapse = () => {
     const newState = !isCollapsed
     setIsCollapsed(newState)
@@ -257,7 +240,7 @@ const toggleTask = async (id: number) => {
     window.api.toggleCollapse(newState)
   }
 
-  // 🌟 واجهة تسجيل الدخول (لو مفيش حساب أو مش مسجل)
+  // واجهة تسجيل الدخول
   if (!session) {
     return (
       <div className="text-white h-screen bg-gray-900 rounded-2xl p-6 shadow-2xl flex flex-col justify-center items-center border border-gray-700/50 relative" style={{ direction: 'rtl' }}>
@@ -292,12 +275,11 @@ const toggleTask = async (id: number) => {
     )
   }
 
-  // 🌟 الواجهة الرئيسية (لو مسجل دخول)
+  // الواجهة الرئيسية
   return (
     <div 
       className="text-white h-screen rounded-2xl p-4 shadow-2xl flex flex-col overflow-hidden border border-gray-700/50 transition-all duration-300 relative"
       style={{
-        // 🌟 لو فيه صورة هيحطها ويحط فوقها طبقة غامقة عشان الكلام يفضل مقروء، لو مفيش هيحط اللون الافتراضي
         backgroundColor: appBgImage ? 'rgba(17, 24, 39, 0.85)' : 'rgba(17, 24, 39, 0.9)',
         backgroundImage: appBgImage ? `url(${appBgImage})` : 'none',
         backgroundSize: 'cover',
@@ -313,14 +295,14 @@ const toggleTask = async (id: number) => {
         showHistory={showHistory}
         onToggleHistory={() => {
           setShowHistory(!showHistory)
-          setShowSettings(false) // اقفل الإعدادات لو السجل اتفتح
+          setShowSettings(false) 
         }}
         pomodoroTime={formattedTime} 
         pomodoroMode={mode} 
-        showSettings={showSettings} // 🌟 تمرير حالة الإعدادات
+        showSettings={showSettings} 
         onToggleSettings={() => {
           setShowSettings(!showSettings)
-          setShowHistory(false) // اقفل السجل لو الإعدادات اتفتحت
+          setShowHistory(false) 
         }}
       />
       
@@ -333,7 +315,6 @@ const toggleTask = async (id: number) => {
             <HistoryList />
           ) : (
             <>
-              {/* 🌟 مؤشر البومودورو (بيظهر بس لو شغال) */}
               <PomodoroTimer 
                 time={formattedTime} 
                 mode={mode} 
@@ -348,7 +329,7 @@ const toggleTask = async (id: number) => {
                 onDelete={deleteTask} 
                 onReorder={reorderTasks} 
                 onUpdateDetails={updateTaskDetails} 
-                onStartFocus={startWork} /* 🌟 تمرير دالة تشغيل التركيز لزرار المهمة */
+                onStartFocus={startWork} 
               />
             </>
           )}

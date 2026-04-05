@@ -16,10 +16,8 @@ export default function NotificationWindow() {
 
   return (
     <div className="h-screen w-screen p-2 box-border flex items-center justify-center overflow-hidden bg-transparent">
-      {/* صندوق الإشعار الشيك */}
       <div className="bg-gray-900 border border-blue-500/50 shadow-[0_0_20px_rgba(59,130,246,0.3)] rounded-xl p-4 w-full h-full flex items-center gap-4 relative overflow-hidden backdrop-blur-md">
         
-        {/* أيقونة الإشعار */}
         <div className="bg-blue-500/20 text-blue-400 w-10 h-10 flex items-center justify-center rounded-full text-xl shrink-0 shadow-[0_0_10px_rgba(59,130,246,0.5)]">
           🔔
         </div>

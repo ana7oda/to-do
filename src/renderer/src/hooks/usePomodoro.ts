@@ -2,19 +2,17 @@ import { useState, useEffect } from 'react';
 
 type PomodoroMode = 'work' | 'break' | 'idle';
 
-// دالة سريعة لجلب الإعدادات من الذاكرة
 const getSettings = () => {
   const saved = localStorage.getItem('odexai-settings');
   return saved ? JSON.parse(saved) : { workTime: 25, breakTime: 5 };
 };
 
 export const usePomodoro = () => {
-  // بنقرأ الوقت الابتدائي من الإعدادات
   const [timeLeft, setTimeLeft] = useState(() => getSettings().workTime * 60);
   const [mode, setMode] = useState<PomodoroMode>('idle');
   const [activeTaskId, setActiveTaskId] = useState<number | null>(null);
 
-  // 🌟 مستشعر لتحديث الوقت فوراً لو المستخدم داس "حفظ" في شاشة الإعدادات
+  //  مستشعر لتحديث الوقت فورا لو المستخدم داس "حفظ" في شاشة الإعدادات
   useEffect(() => {
     const handleSettingsUpdate = () => {
       if (mode === 'idle') {
@@ -36,7 +34,7 @@ export const usePomodoro = () => {
       const audio = new Audio(mode === 'work' ? './done.mp3' : './add.mp3');
       audio.play().catch(e => console.log(e));
 
-      const settings = getSettings(); // نقرأ الإعدادات الجديدة
+      const settings = getSettings(); 
 
       if (mode === 'work') {
         // @ts-ignore
@@ -44,14 +42,14 @@ export const usePomodoro = () => {
         // @ts-ignore
         window.api.showNotification(`عاش يا بطل! خلصت جلسة التركيز، خد بريك ${settings.breakTime} دقايق ☕`);
         
-        // 🌟 إرسال إشعار لديسكورد
+        //  إرسال إشعار لديسكورد
         if (settings.discordWebhook) {
           fetch(settings.discordWebhook, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               username: "OdexAi Tasks",
-              avatar_url: "https://odexai.xyz/logo.png", // رابط اللوجو بتاعك
+              avatar_url: "https://to-do.odexai.xyz/logo.png", 
               embeds: [{
                 title: "🔥 بطل التركيز!",
                 description: `عاش جداً! تم إنهاء جلسة تركيز (Pomodoro) لمدة **${settings.workTime} دقيقة** بنجاح.`,
@@ -69,7 +67,7 @@ export const usePomodoro = () => {
         window.api.showNotification('البريك خلص! يلا نرجع للتركيز 🚀');
         setMode('idle');
         setActiveTaskId(null);
-        setTimeLeft(settings.workTime * 60); // نرجعه لوقت العمل الافتراضي
+        setTimeLeft(settings.workTime * 60); 
       }
     }
 

@@ -22,7 +22,7 @@ function createWindow(): void {
     alwaysOnTop: true,
     resizable: false,
     autoHideMenuBar: true,
-    skipTaskbar: true, // 🌟 دي بتشيل البرنامج من شريط المهام تحت
+    skipTaskbar: true, // 
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -31,7 +31,6 @@ function createWindow(): void {
   })
 
  mainWindow.on('ready-to-show', () => {
-    // لو التطبيق اشتغل تلقائياً مع الويندوز (في الخلفية)، ماتظهروش في وش المستخدم
     if (!process.argv.includes('--hidden')) {
       mainWindow?.show()
     }
@@ -58,29 +57,27 @@ app.whenReady().then(() => {
 
   createWindow()
 
-// 🌟 1. التشغيل التلقائي مع الويندوز (بصمت)
-  // الشرط ده بيمنع التطبيق يسجل نفسه في الويندوز وهو في وضع التطوير (عشان ميجيبش الشاشة الزرقاء)
+//  1. التشغيل التلقائي مع الويندوز (بصمت)
   if (app.isPackaged) {
     app.setLoginItemSettings({
       openAtLogin: true,
-      path: process.execPath, // 🌟 السطر ده بيجبره يشاور على OdexAi Tasks.exe النهائي
+      path: process.execPath, 
       args: ['--hidden']
     })
   }
 
-  // 🌟 2. الاختصار السحري (Alt + Space)
+  //  2. الاختصار السحري (Alt + Space)
   globalShortcut.register('Alt+Space', () => {
     if (mainWindow) {
       if (mainWindow.isVisible()) {
         mainWindow.hide()
       } else {
         mainWindow.show()
-        mainWindow.focus() // السطر ده مهم عشان الكيبورد يكتب جوا البرنامج فوراً
+        mainWindow.focus() 
       }
     }
   })
 
-  // 🌟 إعداد الأيقونة جنب الساعة (System Tray)
   tray = new Tray(icon)
   
   // القائمة اللي بتظهر لما تضغط كليك يمين على الأيقونة
@@ -110,26 +107,21 @@ app.whenReady().then(() => {
  // أمر تصغير/تكبير النافذة (الطي)
   ipcMain.on('toggle-collapse', (_, isCollapsed) => {
     if (mainWindow) {
-      // 1. الخدعة: نسمح بتغيير الحجم مؤقتاً عشان الويندوز يقبل الأمر ومايعملش بلوك
       mainWindow.setResizable(true)
       
-      // 2. نجبر الويندوز يفك أي Snap أو تثبيت في الحواف
       mainWindow.restore()
       mainWindow.unmaximize()
 
-      // 3. نغير الحجم لـ الشريط الصغير أو القائمة الكاملة
       if (isCollapsed) {
         mainWindow.setSize(320, 60)
       } else {
         mainWindow.setSize(320, 500)
       }
 
-      // 4. نرجع نمنع تغيير الحجم تاني فوراً
       mainWindow.setResizable(false)
     }
   })
 
-  // 🌟 إنشاء نافذة الإشعار المخصصة والإشعار الأصلي
   ipcMain.on('show-notification', (_, taskText) => {
     
     // 1. إرسال إشعار الويندوز الأصلي (Native) عشان يتحفظ في مركز الإشعارات (Action Center)
@@ -179,15 +171,11 @@ app.whenReady().then(() => {
     }, 6000)
   })
 
-  // 🌟 تفعيل وضع التركيز (قفل إشعارات الويندوز)
   ipcMain.on('start-focus', () => {
-    // كود PowerShell لتفعيل Focus Assist (Alarms Only)
     exec('powershell -Command "Set-ItemProperty -Path \'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings\' -Name \'NOC_GLOBAL_SETTING_TOASTS_LEVEL\' -Value 2"')
   })
 
-  // 🌟 إيقاف وضع التركيز (تشغيل إشعارات الويندوز تاني)
   ipcMain.on('stop-focus', () => {
-    // كود PowerShell لتعطيل Focus Assist
     exec('powershell -Command "Set-ItemProperty -Path \'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings\' -Name \'NOC_GLOBAL_SETTING_TOASTS_LEVEL\' -Value 0"')
   })
 
@@ -195,10 +183,9 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 
-  // 🌟 1. اسأل السيرفر: فيه تحديث؟
+  //  1. اسأل السيرفر: فيه تحديث؟
   autoUpdater.checkForUpdates()
 
-  // 🌟 مراقبة ما يحدث خلف الكواليس (عشان نعرف المشكلة فين)
   autoUpdater.on('update-available', (info) => {
     dialog.showMessageBox({
       type: 'info',
@@ -207,7 +194,7 @@ app.whenReady().then(() => {
     })
   })
 
-  autoUpdater.on('update-not-available', (info) => {
+  autoUpdater.on('update-not-available', () => {
     dialog.showMessageBox({
       type: 'info',
       title: 'أنت في السليم! ✅',
@@ -216,10 +203,9 @@ app.whenReady().then(() => {
   })
 
   autoUpdater.on('error', (err) => {
-    dialog.showErrorBox('رسالة من الكواليس (خطأ في التحديث) ❌', err == null ? "unknown" : (err.stack || err).toString())
+    console.log('رسالة من الكواليس (خطأ في التحديث) ❌', err == null ? "unknown" : (err.stack || err).toString())
   })
 
-  // 🌟 2. لما التحديث ينزل بالكامل
   autoUpdater.on('update-downloaded', (info) => {
     dialog.showMessageBox({
       type: 'info',
